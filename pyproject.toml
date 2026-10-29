@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dnd-encounter-generator"
+version = "0.1.0"
+description = "A D&D 5e encounter balancing and generation tool"
+requires-python = ">=3.10"
+dependencies = ["rich","questionary"]
+
+[project.scripts]
+dnd-encounter-generator = "dnd_encounter_generator.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+dnd_encounter_generator = ["data/*.json"]
