@@ -77,7 +77,7 @@ def choose_encounter_settings():
     if difficulty is None:
         return None
 
-    minimum_enemies = questionary.text("Minimum number of monsters:",default="1",validate=lambda value: (value.isdigit() and int(value) >= 1)).ask()
+    minimum_enemies = questionary.text("Minimum number of monsters:",default="1",validate=lambda value: (value.isdigit() and int(value) >= 1 and int(value) <= 9)).ask()
     if minimum_enemies is None:
         return None
 
