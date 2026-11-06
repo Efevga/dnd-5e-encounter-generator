@@ -7,6 +7,10 @@ A Python tool for generating and evaluating Dungeons & Dragons 5th Edition (2014
 - Calculates encounter difficulty based on party composition and monster XP.
 - Custom encounter-matching system to find and rank encounters based on how well they fit to the party.
 - Generates possible combat encounters and ranks encounters by how well they match the desired difficulty.
+- Monster filtering system:
+  - By Challenge Rating (CR).
+  - By monster type.
+  - By manual selection of individual monsters (independent of other filters).
 - Uses an interactive terminal interface.
 
 ## Requirements

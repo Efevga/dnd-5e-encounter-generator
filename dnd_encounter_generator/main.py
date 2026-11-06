@@ -4,6 +4,7 @@ from .monsters import load_monsters
 from .generator import generate_encounters
 from .optimizer import find_best_encounter, rank_encounters
 from .difficulty import calculate_party_thresholds
+from .monster_filter import filter_monsters_by_name,filter_monsters_by_cr,filter_monsters_by_type,create_filter,apply_filter
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from rich.console import Console
 from rich.panel import Panel
@@ -87,6 +88,59 @@ def choose_encounter_settings():
 
     return difficulty, int(minimum_enemies), int(maximum_enemies)
 
+def select_monsters(monsters,filter):
+    monster_choices = [questionary.Choice(title=name, value=name, checked=name in filter["selected_names"]) for name in  sorted(monsters.keys())]
+    selected_monsters = questionary.checkbox("Select Monsters:", choices=monster_choices).ask()
+        
+    if selected_monsters is not None:
+        filter["selected_names"] = set(selected_monsters)
+        
+def select_monsters_by_cr(monsters,filter):
+    availible_crs = sorted(set(monster.cr for monster in monsters.values()))
+
+    cr_choices = [questionary.Choice(title= f"CR {cr}", value=cr, checked=cr in filter["selected_crs"]) for cr in availible_crs]
+    selected_crs = questionary.checkbox("Select Monster CRs:", choices=cr_choices).ask()
+    
+    if selected_crs is not None:
+        filter["selected_crs"] = set(selected_crs)
+
+def select_monster_types(monsters,filter):
+    availible_types = sorted(set(monster.monster_type for monster in monsters.values()))
+    type_choices = [questionary.Choice(title=monster_type.capitalize(), value=monster_type, checked=monster_type in filter["selected_types"]) for monster_type in availible_types]
+    selected_types = questionary.checkbox("Select Monster Types:", choices=type_choices).ask()
+
+    if selected_types is not None:
+        filter["selected_types"] = set(selected_types)
+
+def choose_monster_filters(monsters):
+    filter = create_filter()
+
+    while True:
+        current_monsters = apply_filter(monsters,filter)
+
+        custom_style = questionary.Style([("selected", "fg:#F4320B"),("pointer", "fg:#F4320B"),("highlighted", "fg:#F4320B"),("text", "fg:#F87C63")])
+
+        choice = questionary.select(f"Monster Filtering ({len(current_monsters)} monsters available)",
+            choices=["Challenge Rating Filter","Monster Type Filter","Manual Monster Selection","Disable All Filters","Use All Monsters","Generate Encounters"],style=custom_style).ask()
+
+        if choice is None:
+            return None
+        elif choice == "Challenge Rating Filter":
+            select_monsters_by_cr(monsters, filter)
+        elif choice == "Monster Type Filter":
+            select_monster_types(monsters, filter)
+        elif choice == "Manual Monster Selection":
+            select_monsters(monsters, filter)
+        elif choice == "Disable All Filters":
+            filter = create_filter()
+        elif choice == "Use All Monsters":
+            return monsters
+        elif choice == "Generate Encounters":
+            if not current_monsters:
+                console.print("[orange1]No monsters match your filters![/orange1]")
+                continue
+
+            return current_monsters
 
 def generate_and_display_encounters(monsters, party):
     settings = choose_encounter_settings()
@@ -176,7 +230,12 @@ def main():
 
     if party is not None:
         console.print("\n[bold red]Party created[/bold red]")
-        generate_and_display_encounters(monsters, party)
+
+        filtered_monsters = choose_monster_filters(monsters)
+        if filtered_monsters is None:
+            return
+
+        generate_and_display_encounters(filtered_monsters, party)
 
 if __name__ == "__main__":
     main()
