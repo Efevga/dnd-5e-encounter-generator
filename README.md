@@ -39,4 +39,4 @@ This project uses the D&D 5th Edition (2014) encounter XP and difficulty rules.
 
 ## Project Status
 
-This project is currently under development. The remaining monsters will be added to the database, and multiclass character support will be implemented in a future update.
+This project is currently under development. All the monsters have been added to the database. Multiclass character support will be implemented in a future update.
